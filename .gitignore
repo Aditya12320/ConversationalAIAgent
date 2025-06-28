@@ -1,0 +1,17 @@
+# Ignore sensitive and local-only files
+.env
+*.env
+client_secret.json
+calendar-booking-agent-464010-fc06e9bd442c.json
+
+# Ignore virtual environments anywhere
+**/venv/
+**/.venv/
+**/env/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+
+tokens/*
+!tokens/.gitkeep
