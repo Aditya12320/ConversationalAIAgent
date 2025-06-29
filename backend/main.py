@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-app.include_router(auth_router, prefix="/api")
+app.include_router(auth_router, prefix="/api")  # Remove the extra /auth
 
 # Rate limiting
 limiter = Limiter(key_func=get_remote_address)

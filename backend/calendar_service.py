@@ -23,25 +23,22 @@ class GoogleCalendarService:
             if not user_id:
                 raise ValueError("User ID cannot be None")
 
-            # Create tokens directory if it doesn't exist
             os.makedirs("tokens", exist_ok=True)
-            
-            creds = None
             token_file = f"tokens/{user_id}.json"
             
-            if os.path.exists(token_file):
-                creds = Credentials.from_authorized_user_file(token_file, self.scopes)
-
+            # If token doesn't exist, return None to trigger re-auth
+            if not os.path.exists(token_file):
+                return None
+                
+            creds = Credentials.from_authorized_user_file(token_file, self.scopes)
+            
             if not creds or not creds.valid:
                 if creds and creds.expired and creds.refresh_token:
                     creds.refresh(Request())
+                    self._save_credentials(user_id, creds)
                 else:
                     return None
-                
-                # Save the refreshed credentials
-                with open(token_file, 'w') as token:
-                    token.write(creds.to_json())
-
+                    
             return creds
         except Exception as e:
             logger.error(f"Authentication failed: {str(e)}")

@@ -28,19 +28,24 @@ backend_url = os.getenv("BACKEND_URL", "http://localhost:8000")
 def check_auth():
     try:
         response = requests.get(
-            f"{backend_url}/auth/status",
+            f"{backend_url}/api/auth/status",
             params={"user_id": st.session_state.user_id},
             timeout=5
         )
         if response.status_code == 200:
-            st.session_state.authenticated = response.json().get("authenticated", False)
-        return st.session_state.authenticated
+            auth_status = response.json()
+            st.session_state.authenticated = auth_status.get("authenticated", False)
+            if not st.session_state.authenticated and auth_status.get("error"):
+                st.error(f"Auth error: {auth_status['error']}")
+            return st.session_state.authenticated
+        return False
     except Exception as e:
         st.error(f"Connection error: {str(e)}")
         return False
 
+
 def authenticate():
-    auth_url = f"{backend_url}/auth?user_id={st.session_state.user_id}"
+    auth_url = f"{backend_url}/api/auth?user_id={st.session_state.user_id}"  # Removed duplicate /auth
     webbrowser.open_new_tab(auth_url)
 
 if st.session_state.authenticated and st.sidebar.button("Logout"):
